@@ -1,53 +1,87 @@
+"use client";
+
 import Link from "next/link";
-import { PHOTOS } from "./photo_feed/photos";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
+  const [photos, setPhotos] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/photos?_limit=12")
+      .then(res => res.json())
+      .then(data => setPhotos(data));
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-7xl font-extrabold text-gray-900 mb-4">Photo Gallery</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">Discover stunning photography from iconic landmarks around the world</p>
-        </div>
-        
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {PHOTOS.map((photo) => (
-            <Link key={photo.id} href={`/photo/${photo.id}`}>
-              <div className="group cursor-pointer h-full">
-                <div className="relative rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 h-96 flex flex-col">
-                  {/* Image Container */}
-                  <div className="relative h-64 overflow-hidden bg-gray-200">
-                    <img 
-                      src={photo.src} 
-                      alt={photo.title} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  
-                  {/* Card Content */}
-                  <div className="flex-1 p-6 flex flex-col justify-between bg-white">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {photo.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-3">
-                        {photo.desc}
-                      </p>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <button className="text-blue-600 font-semibold text-sm hover:text-blue-700 transition-colors">
-                        View Details →
-                      </button>
-                    </div>
-                  </div>
-                </div>
+    <div style={{ 
+      padding: '60px 20px', 
+      backgroundColor: '#ffffff', 
+      minHeight: '100vh',
+      // Professional Font Stack
+      fontFamily: 'Inter, system-ui, -apple-system, sans-serif' 
+    }}>
+      <h1 style={{ 
+        textAlign: 'center', 
+        marginBottom: '50px', 
+        color: '#0f172a', 
+        fontSize: '3rem', 
+        fontWeight: '900',
+        letterSpacing: '-0.05em'
+      }}>
+        Explore Gallery
+      </h1>
+      
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
+        gap: '32px', 
+        maxWidth: '1300px', 
+        margin: '0 auto' 
+      }}>
+        {photos.map((p) => (
+          <Link key={p.id} href={`/photo/${p.id}`} style={{ textDecoration: 'none' }}>
+            <div 
+              style={{ 
+                backgroundColor: '#fff', 
+                borderRadius: '24px', 
+                overflow: 'hidden', 
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)', 
+                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                border: '1px solid #f1f5f9'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 30px 60px rgba(0,0,0,0.12)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+              }}
+            >
+              <div style={{ backgroundColor: '#f1f5f9', height: '240px', width: '100%' }}>
+                <img 
+                  // Using Unsplash source to fix the broken image issue
+                  src={`https://picsum.photos/seed/${p.id}/600/400`} 
+                  alt={p.title} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
               </div>
-            </Link>
-          ))}
-        </div>
-      </main>
+              <div style={{ padding: '24px' }}>
+                <p style={{ 
+                  margin: 0, 
+                  fontSize: '16px', 
+                  color: '#1e293b', 
+                  fontWeight: '600', 
+                  lineHeight: '1.5',
+                  textTransform: 'capitalize'
+                }}>
+                  {p.title}
+                </p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

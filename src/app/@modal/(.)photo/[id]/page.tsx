@@ -1,54 +1,69 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { PHOTOS } from "../../../photo_feed/photos";
-import { useCallback, use } from "react";
+import { use, useEffect, useState } from "react";
 
 export default function PhotoModal({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   const { id } = use(params);
-  const photo = PHOTOS.find((p) => p.id === id);
+  const [photo, setPhoto] = useState<any>(null);
 
-  const handleClose = useCallback(() => {
-    router.back();
-  }, [router]);
+  useEffect(() => {
+    fetch(`https://jsonplaceholder.typicode.com/photos/${id}`)
+      .then((res) => res.json())
+      .then((data) => setPhoto(data));
+  }, [id]);
 
   if (!photo) return null;
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in" 
-      onClick={handleClose}
-    >
-      <div 
-        className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-2xl w-full animate-in zoom-in-95 duration-300" 
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="relative">
-          <button
-            onClick={handleClose}
-            className="absolute top-6 right-6 bg-white/90 hover:bg-white text-gray-900 rounded-full w-12 h-12 flex items-center justify-center z-10 transition-all hover:scale-110 shadow-lg"
-            aria-label="Close"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <img
-            src={photo.src}
-            alt={photo.title}
-            className="w-full h-auto object-cover max-h-96"
-          />
-        </div>
-        <div className="p-8 bg-white">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">{photo.title}</h1>
-          <p className="text-lg text-gray-600 leading-relaxed">{photo.desc}</p>
-          <button
-            onClick={handleClose}
-            className="mt-6 w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition-all hover:shadow-lg"
-          >
-            Close
-          </button>
+    <div style={{ 
+      position: 'fixed', inset: 0, 
+      background: 'rgba(15, 23, 42, 0.85)', // Darker overlay to match your screenshot
+      backdropFilter: 'blur(12px)', 
+      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+      zIndex: 1000,
+      fontFamily: 'Inter, system-ui, sans-serif' 
+    }}>
+      <div style={{ 
+        background: 'white', 
+        width: '90%', maxWidth: '600px', 
+        borderRadius: '32px', // Extra rounded corners to match the gallery
+        overflow: 'hidden', 
+        position: 'relative', 
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
+      }}>
+        {/* Modern Close Button */}
+        <button 
+          onClick={() => window.history.back()} 
+          style={{ 
+            position: 'absolute', top: '20px', right: '20px', 
+            background: 'white', border: '1px solid #e2e8f0', borderRadius: '50%', 
+            width: '40px', height: '40px', cursor: 'pointer', 
+            fontSize: '18px', zIndex: 10,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}
+        >✕</button>
+        
+        {/* FIXED IMAGE SOURCE */}
+        <img 
+          src={`https://picsum.photos/seed/${id}/800/600`} 
+          alt={photo.title} 
+          style={{ width: '100%', display: 'block', maxHeight: '65vh', objectFit: 'cover' }} 
+        />
+        
+        <div style={{ padding: '32px' }}>
+          <h2 style={{ 
+            fontSize: '24px', 
+            margin: '0 0 12px 0', 
+            color: '#0f172a', 
+            fontWeight: '800',
+            textTransform: 'capitalize' // Matching the gallery style
+          }}>
+            {photo.title}
+          </h2>
+          <p style={{ color: '#64748b', fontSize: '16px', fontWeight: '500' }}>
+            Currently viewing Photo #{id} via Intercepted Route.
+          </p>
         </div>
       </div>
     </div>
